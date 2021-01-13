@@ -16,9 +16,9 @@ const ProductController = (function () {
 
     const data = {
         products: [
-            { id: 0, name: "Laptop", price: 8000 },
-            { id: 0, name: "İşlemci", price: 4000 },
-            { id: 0, name: "Ram", price: 2000 }
+            { id: 1, name: "Laptop", price: 8000 },
+            { id: 2, name: "İşlemci", price: 4000 },
+            { id: 3, name: "Ram", price: 2000 }
         ],
         selectedProduct: null,
         totalPrice: 0,
@@ -26,10 +26,10 @@ const ProductController = (function () {
 
     // Public
     return {
-        getProducts: function(){
+        getProducts: function () {
             return data.products;
         },
-        getData: function(){
+        getData: function () {
             return data;
         }
     }
@@ -38,16 +38,47 @@ const ProductController = (function () {
 // UI Controller
 const UIController = (function () {
 
+    const Selectors = {
+        productList: "#item-list"
+    }
+
+    return {
+        createProductList: function (products) {
+            let html = '';
+
+            products.forEach(prd => {
+                html+=`
+                    <tr>
+                        <td>${prd.id}</td>
+                        <td>${prd.name}</td>
+                        <td>${prd.price}</td>
+                        <td class="text-right">
+                            <button type="submit" class="btn btn-warning btn-sm">
+                                <i class="far fa-edit"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            document.querySelector(Selectors.productList).innerHTML = html;
+        },
+        
+        getSelectors : function(){
+            return Selectors;
+        }
+    }
 
 })()
 
 // App Controller
 const App = (function (ProductCtrl, UICtrl) {
-    return{
-        init: function(){
+    return {
+        init: function () {
             console.log("Uygulama Çalışıyor!");
             const products = ProductCtrl.getProducts();
-            console.log(products);
+            
+            UICtrl.createProductList(products);
         }
     }
 
