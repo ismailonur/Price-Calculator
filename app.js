@@ -59,6 +59,21 @@ const ProductController = (function () {
             data.products.push(newProduct);
             return newProduct;
         },
+
+        updateProduct: function (name, price) {
+            let product = null;
+
+            data.products.forEach(function (prd) {
+                if (prd.id == data.selectedProduct.id) {
+                    prd.name = name;
+                    prd.price = parseFloat(price);
+                    product = prd;
+                }
+            })
+
+            return product;
+        },
+
         getTotal: function () {
             let total = 0;
 
@@ -77,6 +92,7 @@ const UIController = (function () {
 
     const Selectors = {
         productList: "#item-list",
+        productListItems: "#item-list tr",
         addButton: '.addBtn',
         updateButton: '.updateBtn',
         deleteButton: '.deleteBtn',
@@ -128,6 +144,21 @@ const UIController = (function () {
             document.querySelector(Selectors.productList).innerHTML += item;
         },
 
+        updateProduct: function (prd) {
+            let updatedItem = null;
+
+            let items = document.querySelectorAll(Selectors.productListItems);
+            items.forEach(function (item) {
+                if (item.classList.contains('bg-warning')) {
+                    item.children[1].textContent = prd.name;
+                    item.children[2].textContent = prd.price + ' $';
+                    updatedItem = item;
+                }
+            });
+
+            return updatedItem;
+        },
+
         clearInputs: function () {
             document.querySelector(Selectors.productName).value = '';
             document.querySelector(Selectors.productPrice).value = '';
@@ -148,7 +179,10 @@ const UIController = (function () {
             document.querySelector(Selectors.productPrice).value = selectedProduct.price
         },
 
-        addingState: function () {
+        addingState: function (item) {
+            if(item){
+                item.classList.remove('bg-warning');
+            }
             UIController.clearInputs();
             document.querySelector(Selectors.addButton).style.display = 'inline';
             document.querySelector(Selectors.updateButton).style.display = 'none';
@@ -186,7 +220,12 @@ const App = (function (ProductCtrl, UICtrl) {
         document.querySelector(UISelectors.addButton).addEventListener('click', productAddSubmit);
 
         // edit product
-        document.querySelector(UISelectors.productList).addEventListener('click', productEditSubmit);
+        document.querySelector(UISelectors.productList).addEventListener('click', productEditClick);
+
+        // edit product submit
+        document.querySelector(UISelectors.updateButton).addEventListener('click', editProductSubmit);
+
+
     }
 
     const productAddSubmit = function (e) {
@@ -216,7 +255,7 @@ const App = (function (ProductCtrl, UICtrl) {
         e.preventDefault();
     }
 
-    const productEditSubmit = function (e) {
+    const productEditClick = function (e) {
 
         if (e.target.classList.contains('edit-product')) {
             const id = e.target.parentNode.previousElementSibling.previousElementSibling.previousElementSibling.textContent;
@@ -231,6 +270,30 @@ const App = (function (ProductCtrl, UICtrl) {
             UICtrl.addProductToForm();
 
             UICtrl.editState(e.target.parentNode.parentNode);
+        }
+
+        e.preventDefault();
+    }
+
+    const editProductSubmit = function (e) {
+
+        const productName = document.querySelector(UISelectors.productName).value;
+        const productPrice = document.querySelector(UISelectors.productPrice).value;
+
+        if (productName !== '' && productPrice !== '') {
+            // update product
+            const updatedProduct = ProductCtrl.updateProduct(productName, productPrice);
+
+            // update ui
+            let item = UICtrl.updateProduct(updatedProduct);
+
+            // get total
+            const total = ProductCtrl.getTotal();
+
+            // show total
+            UICtrl.showTotal(total);
+
+            UICtrl.addingState(item);
         }
 
         e.preventDefault();
