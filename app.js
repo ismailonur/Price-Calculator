@@ -113,7 +113,7 @@ const UIController = (function () {
                     <tr>
                         <td>${prd.id}</td>
                         <td>${prd.name}</td>
-                        <td>${prd.price}</td>
+                        <td>${prd.price} $</td>
                         <td class="text-right">
                             <i class="far fa-edit edit-product"></i>
                         </td>
@@ -134,7 +134,7 @@ const UIController = (function () {
                 <tr>
                     <td>${prd.id}</td>
                     <td>${prd.name}</td>
-                    <td>${prd.price}</td>
+                    <td>${prd.price} $</td>
                     <td class="text-right">
                         <i class="far fa-edit edit-product"></i>
                     </td>
@@ -164,6 +164,15 @@ const UIController = (function () {
             document.querySelector(Selectors.productPrice).value = '';
         },
 
+        clearWarnings: function () {
+            const items = document.querySelectorAll(Selectors.productListItems);
+            items.forEach(function (item) {
+                if (item.classList.contains('bg-warning')) {
+                    item.classList.remove('bg-warning');
+                }
+            })
+        },
+
         hideCard: function () {
             document.querySelector(Selectors.productCard).style.display = 'none';
         },
@@ -180,9 +189,7 @@ const UIController = (function () {
         },
 
         addingState: function (item) {
-            if(item){
-                item.classList.remove('bg-warning');
-            }
+            UIController.clearWarnings();
             UIController.clearInputs();
             document.querySelector(Selectors.addButton).style.display = 'inline';
             document.querySelector(Selectors.updateButton).style.display = 'none';
@@ -191,13 +198,6 @@ const UIController = (function () {
         },
 
         editState: function (tr) {
-
-            const parent = tr.parentNode;
-
-            for (let i = 0; i < parent.children.length; i++) {
-                parent.children[i].classList.remove('bg-warning');
-            }
-
             tr.classList.add('bg-warning');
             document.querySelector(Selectors.addButton).style.display = 'none';
             document.querySelector(Selectors.updateButton).style.display = 'inline';
@@ -225,7 +225,8 @@ const App = (function (ProductCtrl, UICtrl) {
         // edit product submit
         document.querySelector(UISelectors.updateButton).addEventListener('click', editProductSubmit);
 
-
+        // cancel button click
+        document.querySelector(UISelectors.cancelButton).addEventListener('click', cancelUpdate);
     }
 
     const productAddSubmit = function (e) {
@@ -293,9 +294,16 @@ const App = (function (ProductCtrl, UICtrl) {
             // show total
             UICtrl.showTotal(total);
 
-            UICtrl.addingState(item);
+            UICtrl.addingState();
         }
 
+        e.preventDefault();
+    }
+
+    const cancelUpdate = function (e) {
+
+        UICtrl.addingState();
+        UICtrl.clearWarnings();
         e.preventDefault();
     }
 
