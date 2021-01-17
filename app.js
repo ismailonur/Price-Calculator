@@ -323,8 +323,6 @@ const App = (function (ProductCtrl, UICtrl, StorageCtrl) {
             UIController.clearInputs();
         }
 
-        console.log(productName, productPrice);
-
         e.preventDefault();
     }
 
