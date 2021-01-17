@@ -1,7 +1,29 @@
 // Storage Controller
 const StorageController = (function () {
 
+    return {
+        storeProduct: function (product) {
+            let products;
+            if (localStorage.getItem('products') === null) {
+                products = [];
+                products.push(product);
+            } else {
+                products = JSON.parse(localStorage.getItem('products'));
+                products.push(product);
+            }
+            localStorage.setItem('products', JSON.stringify(products));
+        },
 
+        getProducts: function () {
+            let products;
+            if (localStorage.getItem('products') == null) {
+                products = [];
+            } else {
+                products = JSON.parse(localStorage.getItem('products'));
+            }
+            return products;
+        }
+    }
 })();
 
 // Product Controller
@@ -15,7 +37,7 @@ const ProductController = (function () {
     }
 
     const data = {
-        products: [],
+        products: StorageController.getProducts(),
         selectedProduct: null,
         totalPrice: 0,
     }
@@ -25,9 +47,11 @@ const ProductController = (function () {
         getProducts: function () {
             return data.products;
         },
+
         getData: function () {
             return data;
         },
+
         getProductById: function (id) {
             let product = null;
 
@@ -39,12 +63,15 @@ const ProductController = (function () {
 
             return product;
         },
+
         setCurrentProduct: function (product) {
             data.selectedProduct = product;
         },
+
         getCurrentProduct: function () {
             return data.selectedProduct;
         },
+
         addProduct: function (name, price) {
             let id;
 
@@ -226,7 +253,7 @@ const UIController = (function () {
 })()
 
 // App Controller
-const App = (function (ProductCtrl, UICtrl) {
+const App = (function (ProductCtrl, UICtrl, StorageCtrl) {
 
     const UISelectors = UICtrl.getSelectors();
 
@@ -260,6 +287,9 @@ const App = (function (ProductCtrl, UICtrl) {
 
             // add item to list
             UIController.addProduct(newProduct);
+
+            // add product to LS
+            StorageCtrl.storeProduct(newProduct);
 
             // get total
             const total = ProductCtrl.getTotal();
@@ -348,7 +378,7 @@ const App = (function (ProductCtrl, UICtrl) {
 
         UICtrl.addingState();
 
-        if(total == 0){
+        if (total == 0) {
             UICtrl.hideCard();
         }
 
@@ -375,6 +405,6 @@ const App = (function (ProductCtrl, UICtrl) {
         }
     }
 
-})(ProductController, UIController);
+})(ProductController, UIController, StorageController);
 
 App.init();
